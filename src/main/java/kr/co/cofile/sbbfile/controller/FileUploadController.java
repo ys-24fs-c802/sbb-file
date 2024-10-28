@@ -98,24 +98,4 @@ public class FileUploadController {
         }
     }
 
-
-    // 예외 처리 메서드
-    @ExceptionHandler(FileNotFoundException.class)
-    public String handleFileNotFoundException(
-            FileNotFoundException e,
-            Model model,
-            HttpServletRequest request) {
-
-        log.error("파일 다운로드 오류: {}", e.getMessage());
-
-        ErrorResponse errorResponse = ErrorResponse.of(
-                "FILE_NOT_FOUND",
-                e.getMessage(),
-                request.getRequestURI()
-        );
-        model.addAttribute("error", errorResponse);
-
-        return "error/error";  // error.html 템플릿을 사용
-    }
-
 }
