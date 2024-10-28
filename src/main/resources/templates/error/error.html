@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Error</title>
+</head>
+<body>
+<h1 th:text="${error.code}">ERROR</h1>
+
+<div th:text="${error.message}">에러 메시지 표시</div>
+
+<p>요청 경로: <span th:text="${error.path}"></span></p>
+<p>발생 시간: <span th:text="${#temporals.format(error.timestamp, 'yyyy-MM-dd HH:mm:ss')}"></span></p>
+
+<a href="/static" class="back-button">메인 페이지로 돌아가기</a>
+</body>
+</html>

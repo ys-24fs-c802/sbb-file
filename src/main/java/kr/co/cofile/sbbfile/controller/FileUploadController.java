@@ -1,5 +1,9 @@
 package kr.co.cofile.sbbfile.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import kr.co.cofile.sbbfile.dto.ErrorResponse;
+import kr.co.cofile.sbbfile.exception.FileNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -7,6 +11,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,10 +21,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Controller
 @RequestMapping("/file")
 public class FileUploadController {
@@ -83,7 +90,8 @@ public class FileUploadController {
                         .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
                         .body(resource);
             } else {
-                throw new RuntimeException("Could not read the file!");
+//                throw new RuntimeException("Could not read the file!");
+                throw new FileNotFoundException("File not found: " + filename);
             }
         } catch (MalformedURLException e) {
             throw new RuntimeException("Error: " + e.getMessage());
@@ -91,5 +99,23 @@ public class FileUploadController {
     }
 
 
+    // 예외 처리 메서드
+    @ExceptionHandler(FileNotFoundException.class)
+    public String handleFileNotFoundException(
+            FileNotFoundException e,
+            Model model,
+            HttpServletRequest request) {
+
+        log.error("파일 다운로드 오류: {}", e.getMessage());
+
+        ErrorResponse errorResponse = ErrorResponse.of(
+                "FILE_NOT_FOUND",
+                e.getMessage(),
+                request.getRequestURI()
+        );
+        model.addAttribute("error", errorResponse);
+
+        return "error/error";  // error.html 템플릿을 사용
+    }
 
 }
